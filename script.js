@@ -30,7 +30,7 @@ const calculate = (num1, operator, num2) => {
 keys.addEventListener('click', e => {
     if(e.target.matches('button')){
         // 'e' is the short var reference for event object which will be passed to event handlers
-        const key = e.target
+        const key = e.target // 
 
         // key.dataset.action is accessing the value of the data-action attribute from the key element and storing it in a constant variable named action
         const action = key.dataset.action
