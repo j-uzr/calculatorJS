@@ -14,6 +14,7 @@ const calculate = (num1, operator, num2) => {
     if(operator === 'add'){
         result = parseFloat(num1) + parseFloat(num2)
     }
+
     else if(operator === 'subtract'){
         result = parseFloat(num1) - parseFloat(num2)
     }
@@ -23,14 +24,20 @@ const calculate = (num1, operator, num2) => {
     }
 
     else if(operator === 'divide'){
+
+        if(num2 == '0'){
+            return 'Undefined'
+        }
+
         result = parseFloat(num1) / parseFloat(num2)
     } 
+    return result
 }
 
 keys.addEventListener('click', e => {
     if(e.target.matches('button')){
         // 'e' is the short var reference for event object which will be passed to event handlers
-        const key = e.target // 
+        const key = e.target 
 
         // key.dataset.action is accessing the value of the data-action attribute from the key element and storing it in a constant variable named action
         const action = key.dataset.action
@@ -44,30 +51,46 @@ keys.addEventListener('click', e => {
         
         if(!action){
             console.log('number key!')
+
             if(displayedNum === '0'|| previousKeyType === 'operator'){
                 display.textContent = keyContent
-                calculator.dataset.previousKeyType = keyContent // THIS IS NOT ON THE TUTORIAL
             }
             else{
                 display.textContent = displayedNum + keyContent
             }
-        }
-        if(action === 'add' || action === 'subtract' || action === 'multiply' ||action === 'divide'){
-            console.log('operator key!')
-            key.classList.add('is-depressed')
             
+            calculator.dataset.previousKeyType = 'number' // THIS IS NOT ON THE TUTORIAL
+        }
+
+        if((action === 'add' || action === 'subtract' || action === 'multiply' ||action === 'divide')){
+            console.log('operator key!')
+
             calculator.dataset.firstValue = displayedNum
             calculator.dataset.operator = action
+
+            if(previousKeyType === 'number' || previousKeyType === 'calculate'){
+                key.classList.add('is-depressed')
+            }
+        
             calculator.dataset.previousKeyType = 'operator'
+
         }
+
         if (action === 'decimal' && !displayedNum.includes('.')) {
             console.log('decimal key!')
             display.textContent = displayedNum + '.'
+
+            if(previousKeyType === 'operator'){
+                display.textContent = '0.'
+            }
+
+            calculator.dataset.previousKeyType = 'decimal'
         }
           
         if (action === 'clear') {
             console.log('clear key!')
             display.textContent = '0'
+            calculator.dataset.previousKeyType = 'clear'
         }
         
         if (action === 'calculate') {
@@ -77,7 +100,10 @@ keys.addEventListener('click', e => {
             const firstValue = calculator.dataset.firstValue
             const operator = calculator.dataset.operator
 
-            display.textContent = calculate(firtstValue, operator, secondValue)
+            display.textContent = calculate(firstValue, operator, secondValue)
+
+            calculator.dataset.previousKeyType = 'calculate'
         }
+
     }
 })
