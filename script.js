@@ -6,10 +6,6 @@ The first steps to building this calculator are to be able to
 In this case, we can use an event delegation pattern to listen, since the keys are all children of .calculator__keys via query selector.
 */
 
-const calculator = document.querySelector('.calculator')
-const keys = calculator.querySelector('.calculator__keys')
-const display = document.querySelector('.calculator__display')
-
 const calculate = (num1, operator, num2) => {
     if(operator === 'add'){
         result = parseFloat(num1) + parseFloat(num2)
@@ -34,6 +30,10 @@ const calculate = (num1, operator, num2) => {
     return result
 }
 
+const calculator = document.querySelector('.calculator')
+const keys = calculator.querySelector('.calculator__keys')
+const display = document.querySelector('.calculator__display')
+
 keys.addEventListener('click', e => {
     if(e.target.matches('button')){
         // 'e' is the short var reference for event object which will be passed to event handlers
@@ -52,35 +52,43 @@ keys.addEventListener('click', e => {
         if(!action){
             console.log('number key!')
 
-            if(displayedNum === '0'|| previousKeyType === 'operator'){
+            if(displayedNum === '0'|| previousKeyType === 'operator' || previousKeyType === 'calculate'){
                 display.textContent = keyContent
             }
             else{
                 display.textContent = displayedNum + keyContent
             }
             
-            calculator.dataset.previousKeyType = 'number' // THIS IS NOT ON THE TUTORIAL
+            calculator.dataset.previousKeyType = 'number'
         }
 
         if((action === 'add' || action === 'subtract' || action === 'multiply' ||action === 'divide')){
             console.log('operator key!')
 
-            calculator.dataset.firstValue = displayedNum
-            calculator.dataset.operator = action
-
-            if(previousKeyType === 'number' || previousKeyType === 'calculate'){
-                key.classList.add('is-depressed')
+            const firstValue = calculator.dataset.firstValue
+            const operator = calculator.dataset.operator
+            const secondValue = displayedNum
+            
+            // Note: It's sufficient to check for firstValue and operator because secondValue always exists
+            if (firstValue && operator && previousKeyType !== 'operator' && previousKeyType !== 'calculate') {
+                const calcValue = calculate(firstValue, operator, secondValue)
+                display.textContent = calcValue
+                calculator.dataset.firstValue = calcValue
+            }
+            else{
+                calculator.dataset.firstValue = displayedNum
             }
         
+            key.classList.add('is-depressed')
             calculator.dataset.previousKeyType = 'operator'
-
+            calculator.dataset.operator = action
         }
 
         if (action === 'decimal' && !displayedNum.includes('.')) {
             console.log('decimal key!')
             display.textContent = displayedNum + '.'
 
-            if(previousKeyType === 'operator'){
+            if(previousKeyType === 'operator' || previousKeyType === 'calculate'){
                 display.textContent = '0.'
             }
 
@@ -95,13 +103,20 @@ keys.addEventListener('click', e => {
         
         if (action === 'calculate') {
             console.log('equal key!')
-            
-            const secondValue = displayedNum
-            const firstValue = calculator.dataset.firstValue
+
+            let  firstValue = calculator.dataset.firstValue
+            let secondValue = displayedNum
             const operator = calculator.dataset.operator
 
-            display.textContent = calculate(firstValue, operator, secondValue)
-
+            if (firstValue) {
+                if(previousKeyType === 'calculate'){
+                    firstValue = displayedNum
+                    secondValue = calculator.dataset.modifiedValue
+                }
+                display.textContent = calculate(firstValue, operator, secondValue)
+              }
+            
+            calculator.dataset.modifiedValue = secondValue
             calculator.dataset.previousKeyType = 'calculate'
         }
 
