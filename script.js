@@ -82,12 +82,15 @@ keys.addEventListener('click', e => {
             key.classList.add('is-depressed')
             calculator.dataset.previousKeyType = 'operator'
             calculator.dataset.operator = action
+            console.log(calculator.dataset.previousKeyType)
         }
 
-        if (action === 'decimal' && !displayedNum.includes('.')) {
+        if (action === 'decimal') {
             console.log('decimal key!')
-            display.textContent = displayedNum + '.'
-
+            if(!displayedNum.includes('.')){
+                display.textContent = displayedNum + '.'
+            }
+            
             if(previousKeyType === 'operator' || previousKeyType === 'calculate'){
                 display.textContent = '0.'
             }
